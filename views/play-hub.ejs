@@ -1,0 +1,30 @@
+<%- include("partials/header") %>
+
+<section class="account-header">
+  <div>
+    <h1>Play SpotMatch</h1>
+    <p class="muted">Join a public game or create your own.</p>
+  </div>
+  <div class="hero-actions">
+    <% if (currentUser) { %>
+      <a href="/account" class="button">Create a game</a>
+    <% } else { %>
+      <a href="/login" class="button">Log in to create a game</a>
+    <% } %>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Open games</h2>
+    <button class="button button-secondary button-sm" id="refresh-btn">Refresh</button>
+  </div>
+
+  <div id="games-list">
+    <%- include("partials/public-games-list", { publicGames }) %>
+  </div>
+</section>
+
+<script src="/play-hub.js"></script>
+
+<%- include("partials/footer") %>

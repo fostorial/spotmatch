@@ -1,0 +1,44 @@
+<%- include("partials/header") %>
+
+<section class="account-header">
+  <div>
+    <p class="eyebrow">Administration</p>
+    <h1>Users</h1>
+  </div>
+</section>
+
+<article class="panel">
+  <div class="panel-header">
+    <h2>All users</h2>
+    <span class="muted"><%= users.length %> total</span>
+  </div>
+
+  <% if (users.length === 0) { %>
+    <p>No users found.</p>
+  <% } else { %>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Decks</th>
+          <th>Admin</th>
+          <th>Joined</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach((user) => { %>
+          <tr>
+            <td><a href="/admin/users/<%= user.id %>"><%= user.username %></a></td>
+            <td class="muted"><%= user.email || '—' %></td>
+            <td><%= user.deck_count %></td>
+            <td><%= user.is_admin ? 'Yes' : '' %></td>
+            <td class="muted"><%= new Date(user.created_at).toLocaleDateString() %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</article>
+
+<%- include("partials/footer") %>

@@ -1,0 +1,55 @@
+<%- include("partials/header") %>
+
+<section class="account-header">
+  <div>
+    <p class="eyebrow"><a href="/decks/<%= deck.id %>" class="back-link">← Back to deck</a></p>
+    <h1><%= deck.title %></h1>
+    <p class="muted">Set up your game</p>
+  </div>
+</section>
+
+<section class="narrow-panel">
+  <%- include("partials/errors") %>
+
+  <form method="post" action="/decks/<%= deck.id %>/play" class="stack-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+    <label>
+      Max players
+      <input
+        type="number"
+        name="maxPlayers"
+        min="1"
+        max="8"
+        value="<%= form.maxPlayers %>"
+        required
+      />
+      <span class="field-hint">1 for solo play, up to 8 for multiplayer.</span>
+    </label>
+
+    <fieldset class="visibility-fieldset">
+      <legend>Visibility</legend>
+      <label class="radio-label">
+        <input type="radio" name="visibility" value="private" <%= form.visibility === 'private' ? 'checked' : '' %> />
+        <span>
+          <strong>Private</strong>
+          <span class="radio-hint">Only players with your invite link can join.</span>
+        </span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="visibility" value="public" <%= form.visibility === 'public' ? 'checked' : '' %> />
+        <span>
+          <strong>Public</strong>
+          <span class="radio-hint">Listed on the Play page — anyone can join.</span>
+        </span>
+      </label>
+    </fieldset>
+
+    <div class="form-actions">
+      <button type="submit" class="button">Create Lobby</button>
+      <a href="/decks/<%= deck.id %>" class="button button-secondary">Cancel</a>
+    </div>
+  </form>
+</section>
+
+<%- include("partials/footer") %>

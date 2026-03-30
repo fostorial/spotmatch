@@ -1,0 +1,30 @@
+<%- include("partials/header") %>
+
+<section class="panel">
+  <h1><%= mode === 'edit' ? 'Edit deck' : 'Create a new deck' %></h1>
+  <p>Give your deck a name and choose how many symbols you want per card.</p>
+  <%- include("partials/errors") %>
+  <form method="post" action="<%= mode === 'edit' ? '/decks/' + deck.id : '/decks' %>" class="stack-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <label>
+      Deck name
+      <input type="text" name="title" value="<%= form.title || '' %>" minlength="3" maxlength="80" required />
+    </label>
+    <label>
+      Version
+      <select name="version" required>
+        <% versions.forEach((version) => { %>
+          <option value="<%= version.key %>" <%= form.version === version.key ? 'selected' : '' %>>
+            <%= version.label %>
+          </option>
+        <% }) %>
+      </select>
+    </label>
+    <p class="helper-text">
+      Junior gives you 30 cards with 6 symbols each — great for younger players. Classic gives you 55 cards with 8 symbols each.
+    </p>
+    <button type="submit" class="button"><%= mode === 'edit' ? 'Save changes' : 'Create deck' %></button>
+  </form>
+</section>
+
+<%- include("partials/footer") %>

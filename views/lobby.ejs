@@ -1,0 +1,182 @@
+<%- include("partials/header") %>
+
+<% if (needsName) { %>
+<!-- ── Name entry / room-full notice (guests only) ────────── -->
+<section class="account-header">
+  <div>
+    <p class="eyebrow"><a href="/play" class="back-link">← Open games</a></p>
+    <h1><%= deck.title %></h1>
+    <p class="muted"><%= roomFull ? 'This game is full' : "You've been invited to play" %></p>
+  </div>
+</section>
+
+<% if (roomFull) { %>
+<section class="narrow-panel">
+  <h2>This game is full</h2>
+  <p>All <%= game.maxPlayers %> player slot<%= game.maxPlayers !== 1 ? 's are' : ' is' %> taken. Check the <a href="/play">open games list</a> for other games.</p>
+</section>
+<% } else { %>
+<section class="narrow-panel">
+  <h2>Choose a display name</h2>
+  <p>Enter a name to join the lobby as a guest.</p>
+  <%- include("partials/errors") %>
+  <form method="post" action="/lobby/<%= game.id %>/join" class="stack-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <label>
+      Your name
+      <input
+        type="text"
+        name="guestName"
+        placeholder="e.g. Alice"
+        maxlength="32"
+        autofocus
+        required
+        value="<%= (form && form.guestName) ? form.guestName : '' %>"
+      />
+    </label>
+    <button type="submit" class="button">Join lobby</button>
+  </form>
+  <p class="form-footer-link">
+    Have an account? <a href="/login">Log in</a> instead.
+  </p>
+</section>
+<% } %>
+
+<% } else { %>
+
+<script id="game-data" type="application/json">
+  <%- JSON.stringify({
+    gameId: game.id,
+    wsToken: wsToken,
+    ownerId: game.ownerId,
+    currentUserId: currentIdentity.id,
+    deckTitle: deck.title,
+    deckId: deck.id,
+    isGuest: currentIdentity.isGuest,
+    maxPlayers: game.maxPlayers,
+    roomFull: roomFull
+  }) %>
+</script>
+<script id="symbols-data" type="application/json">
+  <%- JSON.stringify(symbols) %>
+</script>
+
+<!-- ── Lobby view ──────────────────────────────────────────── -->
+<div id="lobby-view">
+  <section class="account-header">
+    <div>
+      <% if (currentUser) { %>
+        <p class="eyebrow"><a href="/decks/<%= deck.id %>" class="back-link">← Back to deck</a></p>
+      <% } else { %>
+        <p class="eyebrow"><a href="/" class="back-link">← Home</a></p>
+      <% } %>
+      <h1><%= deck.title %></h1>
+      <p class="muted">Game lobby
+        <% if (currentIdentity.isGuest) { %>
+          &mdash; playing as <strong><%= currentIdentity.username %></strong>
+        <% } %>
+      </p>
+    </div>
+    <div class="hero-actions">
+      <button class="button button-secondary" id="share-btn">Copy invite link</button>
+      <% if (currentIdentity.id === game.ownerId) { %>
+        <button class="button" id="start-btn" disabled>Start Game</button>
+      <% } %>
+      <button class="button button-danger" id="lobby-quit-btn">Quit</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header">
+      <h2>Players</h2>
+      <span class="muted" id="player-count-label"></span>
+    </div>
+    <ul class="player-list" id="players-list"></ul>
+    <p class="muted lobby-waiting-msg" id="waiting-msg"></p>
+  </section>
+</div>
+
+<!-- ── Game view (hidden until game starts) ───────────────── -->
+<div id="game-view" hidden>
+  <section class="account-header">
+    <div>
+      <h1><%= deck.title %></h1>
+      <p class="muted">Find the matching symbol!</p>
+    </div>
+    <div class="game-header-right">
+      <div id="game-timer" class="game-timer">00:00</div>
+      <div id="scoreboard" class="scoreboard"></div>
+      <button class="button button-danger button-sm" id="game-quit-btn">Quit game</button>
+    </div>
+  </section>
+
+  <div id="round-status" class="round-status"></div>
+
+  <div class="game-area">
+    <div class="game-card-column">
+      <p class="game-card-label">Center pile</p>
+      <div id="center-card" class="game-card-preview game-card-preview-center"></div>
+    </div>
+    <div class="game-card-column">
+      <p class="game-card-label">Your card — tap to claim!</p>
+      <div id="hand-card" class="game-card-preview game-card-preview-hand"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Game over view (hidden until game ends) ────────────── -->
+<div id="gameover-view" hidden>
+  <section class="account-header">
+    <div>
+      <h1>Game Over!</h1>
+      <p class="muted"><%= deck.title %></p>
+    </div>
+    <div class="hero-actions">
+      <% if (currentIdentity.id === game.ownerId) { %>
+        <a href="/decks/<%= deck.id %>/play" class="button">Play again</a>
+      <% } %>
+      <% if (currentUser) { %>
+        <a href="/decks/<%= deck.id %>" class="button button-secondary">Back to deck</a>
+      <% } else { %>
+        <a href="/" class="button button-secondary">Home</a>
+      <% } %>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header"><h2>Final Scores</h2></div>
+    <ol class="final-scores-list" id="final-scores"></ol>
+  </section>
+</div>
+
+<div id="connection-status" class="connection-status" hidden></div>
+
+<!-- ── Room-full modal ────────────────────────────────────── -->
+<div id="room-full-modal" class="modal-backdrop" <%= roomFull ? '' : 'hidden' %>>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="room-full-title">
+    <h2 class="modal-title" id="room-full-title">Game is full</h2>
+    <p class="modal-body">All <%= game.maxPlayers %> player slot<%= game.maxPlayers !== 1 ? 's are' : ' is' %> taken. Try another game or wait for a slot to open.</p>
+    <div class="modal-actions">
+      <a href="/play" class="button button-secondary">Open games</a>
+      <button class="button" id="room-full-refresh-btn">Check again</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Quit confirmation modal ────────────────────────────── -->
+<div id="quit-modal" class="modal-backdrop" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="quit-modal-title">
+    <h2 class="modal-title" id="quit-modal-title">Quit game?</h2>
+    <p class="modal-body" id="quit-modal-body"></p>
+    <div class="modal-actions">
+      <button class="button button-secondary" id="quit-cancel-btn">Stay</button>
+      <button class="button button-danger" id="quit-confirm-btn">Quit</button>
+    </div>
+  </div>
+</div>
+
+<script src="/lobby.js"></script>
+
+<% } %>
+
+<%- include("partials/footer") %>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= pageTitle %> | SpotMatch</title>
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+    <link rel="stylesheet" href="/styles.css" />
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YMGD7QYPT6"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-YMGD7QYPT6');
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-row">
+        <a class="brand" href="/">
+          <img src="<%= logoDataUrl %>" alt="" class="brand-logo" />
+          SpotMatch
+        </a>
+        <nav class="main-nav">
+          <a href="/">Home</a>
+          <a href="/play">Play</a>
+          <% if (currentUser) { %>
+            <% if (currentUser.is_admin) { %>
+              <a href="/admin">Admin</a>
+            <% } %>
+            <a href="/account">Account (<%= currentUser.username %>)</a>
+            <form method="post" action="/logout" class="inline-form">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <button type="submit" class="link-button">Logout</button>
+            </form>
+          <% } else { %>
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+          <% } %>
+        </nav>
+      </div>
+    </header>
+    <main class="container page-shell">

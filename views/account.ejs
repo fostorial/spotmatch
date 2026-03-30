@@ -1,0 +1,106 @@
+<%- include("partials/header") %>
+
+<section class="account-header">
+  <div>
+    <p class="eyebrow">Account</p>
+    <h1><%= currentUser.username %></h1>
+    <p class="account-email muted"><%= currentUser.email || 'No email address set' %></p>
+  </div>
+  <a class="button" href="/decks/new">Create deck</a>
+</section>
+
+<% if (passwordUpdated) { %>
+  <div class="alert alert-success">Your password was updated successfully.</div>
+<% } %>
+<% if (emailUpdated) { %>
+  <div class="alert alert-success">Your email address was updated successfully.</div>
+<% } %>
+
+<%- include("partials/errors") %>
+
+<section class="stats-grid">
+  <article class="stat-card">
+    <span class="stat-value"><%= stats.totalDecks %></span>
+    <span class="stat-label">Decks owned</span>
+  </article>
+  <article class="stat-card">
+    <span class="stat-value"><%= stats.totalCards %></span>
+    <span class="stat-label">Cards across decks</span>
+  </article>
+  <article class="stat-card">
+    <span class="stat-value"><%= stats.totalSymbols %></span>
+    <span class="stat-label">Symbols</span>
+  </article>
+</section>
+
+<section class="grid-two">
+  <article class="panel">
+    <div class="panel-header">
+      <h2>Your decks</h2>
+      <span class="muted"><%= decks.length %> total</span>
+    </div>
+    <% if (decks.length === 0) { %>
+      <p>You have not created any custom SpotMatch decks yet.</p>
+    <% } else { %>
+      <div class="deck-list">
+        <% decks.forEach((deck) => { %>
+          <article class="deck-item">
+            <div>
+              <h3><a href="/decks/<%= deck.id %>"><%= deck.title %></a></h3>
+              <p><%= deck.version === 'junior' ? 'Junior' : 'Classic' %> deck preset</p>
+              <p class="muted">
+                <%= deck.total_cards %> cards, <%= deck.total_symbols %> symbols, <%= deck.symbols_per_card %> symbols per card
+              </p>
+            </div>
+            <div class="deck-actions">
+              <a class="button button-secondary" href="/decks/<%= deck.id %>/edit">Edit</a>
+              <form method="post" action="/decks/<%= deck.id %>/delete">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <button type="submit" class="button button-danger">Delete</button>
+              </form>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+    <% } %>
+  </article>
+
+  <article class="panel account-settings-panel">
+    <section class="settings-section">
+      <h2>Email address</h2>
+      <form method="post" action="/account/email" class="stack-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <label>
+          <%= currentUser.email ? 'Update email' : 'Add email address' %>
+          <input type="email" name="email" value="<%= currentUser.email || '' %>" maxlength="254" autocomplete="email" required />
+        </label>
+        <button type="submit" class="button">Save email</button>
+      </form>
+    </section>
+
+    <hr class="settings-divider" />
+
+    <section class="settings-section">
+      <h2>Change password</h2>
+      <p class="helper-text"><%= passwordPolicyMessage %></p>
+      <form method="post" action="/account/password" class="stack-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <label>
+          Current password
+          <input type="password" name="currentPassword" autocomplete="current-password" required />
+        </label>
+        <label>
+          New password
+          <input type="password" name="newPassword" autocomplete="new-password" required />
+        </label>
+        <label>
+          Confirm new password
+          <input type="password" name="confirmPassword" autocomplete="new-password" required />
+        </label>
+        <button type="submit" class="button">Update password</button>
+      </form>
+    </section>
+  </article>
+</section>
+
+<%- include("partials/footer") %>

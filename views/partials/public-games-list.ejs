@@ -1,0 +1,28 @@
+<% if (!publicGames || publicGames.length === 0) { %>
+  <p class="muted games-empty">No open games right now. Create one!</p>
+<% } else { %>
+  <ul class="games-list">
+    <% publicGames.forEach(function(g) { %>
+      <li class="game-card-item">
+        <div class="game-card-info">
+          <span class="game-card-title"><%= g.deckTitle %></span>
+          <span class="game-card-meta">
+            Hosted by <strong><%= g.ownerName %></strong>
+            &middot;
+            <span class="player-count"><%= g.playerCount %> / <%= g.maxPlayers %></span> players
+          </span>
+        </div>
+        <div class="game-card-actions">
+          <span class="game-status-badge game-status-<%= g.status %>">
+            <%= g.status === 'lobby' ? 'Waiting' : 'In progress' %>
+          </span>
+          <% if (g.status === 'lobby' && g.playerCount < g.maxPlayers) { %>
+            <a href="/lobby/<%= g.id %>" class="button button-sm">Join</a>
+          <% } else { %>
+            <span class="button button-sm button-secondary" aria-disabled="true">Full</span>
+          <% } %>
+        </div>
+      </li>
+    <% }); %>
+  </ul>
+<% } %>

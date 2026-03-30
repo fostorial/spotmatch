@@ -1,0 +1,22 @@
+<%- include("partials/header") %>
+
+<section class="narrow-panel">
+  <h1>Login</h1>
+  <p>Access your SpotMatch account securely.</p>
+  <%- include("partials/errors") %>
+  <form method="post" action="/login" class="stack-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <label>
+      Username
+      <input type="text" name="username" value="<%= form.username || '' %>" autocomplete="username" required />
+    </label>
+    <label>
+      Password
+      <input type="password" name="password" autocomplete="current-password" required />
+    </label>
+    <button type="submit" class="button">Login</button>
+  </form>
+  <p class="form-footer-link"><a href="/forgot-password">Forgot your password?</a></p>
+</section>
+
+<%- include("partials/footer") %>

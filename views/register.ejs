@@ -1,0 +1,30 @@
+<%- include("partials/header") %>
+
+<section class="narrow-panel">
+  <h1>Create account</h1>
+  <p>Set up a secure login to manage your own custom SpotMatch decks.</p>
+  <%- include("partials/errors") %>
+  <form method="post" action="/register" class="stack-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <label>
+      Username
+      <input type="text" name="username" value="<%= form.username || '' %>" minlength="3" maxlength="32" autocomplete="username" required />
+    </label>
+    <label>
+      Email address
+      <input type="email" name="email" value="<%= form.email || '' %>" maxlength="254" autocomplete="email" required />
+    </label>
+    <label>
+      Password
+      <input type="password" name="password" autocomplete="new-password" required />
+    </label>
+    <label>
+      Confirm password
+      <input type="password" name="confirmPassword" autocomplete="new-password" required />
+    </label>
+    <p class="helper-text">Use at least 12 characters with a mix of letters, numbers, and symbols.</p>
+    <button type="submit" class="button">Create account</button>
+  </form>
+</section>
+
+<%- include("partials/footer") %>

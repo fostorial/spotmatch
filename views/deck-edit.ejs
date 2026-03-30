@@ -1,0 +1,117 @@
+<%- include("partials/header") %>
+
+<section class="account-header">
+  <div>
+    <p class="eyebrow"><a href="/decks/<%= deck.id %>" class="back-link">← <%= deck.title %></a></p>
+    <h1>Edit deck</h1>
+    <p class="muted"><%= deckVersion ? deckVersion.label : deck.version %> deck</p>
+  </div>
+</section>
+
+<%- include("partials/errors") %>
+
+<section class="stats-grid">
+  <article class="stat-card">
+    <a href="/decks/<%= deck.id %>" class="stat-link">
+      <span class="stat-value"><%= deck.total_cards %></span>
+      <span class="stat-label">Cards</span>
+    </a>
+  </article>
+  <article class="stat-card">
+    <a href="/decks/<%= deck.id %>/edit" class="stat-link">
+      <span class="stat-value"><%= deckVersion ? deckVersion.label : deck.version %></span>
+      <span class="stat-label">Version</span>
+    </a>
+  </article>
+  <article class="stat-card">
+    <a href="/decks/<%= deck.id %>/symbols" class="stat-link">
+      <span class="stat-value"><%= deck.total_symbols %></span>
+      <span class="stat-label">Symbols</span>
+    </a>
+  </article>
+</section>
+
+<% if (saved) { %>
+  <div class="alert alert-success">Deck settings saved.</div>
+<% } %>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Deck settings</h2>
+  </div>
+  <form method="post" action="/decks/<%= deck.id %>" class="stack-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <label>
+      Deck name
+      <input type="text" name="title" value="<%= form.title || '' %>" minlength="3" maxlength="80" required />
+    </label>
+    <label>
+      Version
+      <select name="version" required>
+        <% versions.forEach((version) => { %>
+          <option value="<%= version.key %>" <%= form.version === version.key ? 'selected' : '' %>>
+            <%= version.label %>
+          </option>
+        <% }) %>
+      </select>
+    </label>
+    <p class="helper-text">
+      Junior gives you 30 cards with 6 symbols each — great for younger players. Classic gives you 55 cards with 8 symbols each.
+    </p>
+    <button type="submit" class="button">Save changes</button>
+  </form>
+</section>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Card Back</h2>
+  </div>
+
+  <% if (cardBackUpdated) { %>
+    <div class="alert alert-success">Card back updated. Your next export will use the new image.</div>
+  <% } %>
+  <% if (cardBackRemoved) { %>
+    <div class="alert alert-success">Custom card back removed. The default design will be used.</div>
+  <% } %>
+
+  <div class="card-back-layout">
+    <div class="card-back-preview-wrap">
+      <div class="card-back-preview">
+        <% if (deck.card_back_image) { %>
+          <img src="<%= deck.card_back_image %>" alt="Custom card back" class="card-back-img" />
+        <% } else { %>
+          <div class="card-back-default">
+            <img src="<%= placeholderImageDataUrl %>" alt="Default card back" class="card-back-placeholder-img" />
+          </div>
+        <% } %>
+      </div>
+      <p class="card-back-label muted"><%= deck.card_back_image ? 'Custom' : 'Default' %></p>
+    </div>
+
+    <div class="card-back-controls">
+      <% if (deck.card_back_image) { %>
+        <p class="helper-text">Your custom image is used on all printed card backs. Upload a new image to replace it, or remove it to go back to the default design.</p>
+      <% } else { %>
+        <p class="helper-text">Upload a square PNG to use as your card back. It will be cropped to a circle on the printed card.</p>
+      <% } %>
+
+      <form method="post" action="/decks/<%= deck.id %>/card-back" enctype="multipart/form-data" class="stack-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <label>
+          <%= deck.card_back_image ? 'Replace image' : 'Upload image' %>
+          <input type="file" name="image" accept=".png,image/png" required />
+        </label>
+        <button type="submit" class="button">Save card back</button>
+      </form>
+
+      <% if (deck.card_back_image) { %>
+        <form method="post" action="/decks/<%= deck.id %>/card-back/remove" class="inline-action">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button type="submit" class="button button-secondary">Remove custom back</button>
+        </form>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<%- include("partials/footer") %>

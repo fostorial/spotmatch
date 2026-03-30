@@ -1,0 +1,83 @@
+<%- include("partials/header") %>
+
+<section class="account-header">
+  <div>
+    <p class="eyebrow"><a href="/decks/<%= deck.id %>" class="back-link">← <%= deck.title %></a></p>
+    <h1>Symbols</h1>
+    <p class="muted"><%= deckVersion ? deckVersion.label : deck.version %> deck &mdash; <%= symbols.length %> symbols</p>
+  </div>
+</section>
+
+<% if (symbolUpdated) { %>
+  <div class="alert alert-success">The symbol was updated.</div>
+<% } %>
+
+<% if (imageRemoved) { %>
+  <div class="alert alert-success">The symbol image was removed.</div>
+<% } %>
+
+<%- include("partials/errors") %>
+
+<section class="stats-grid">
+  <article class="stat-card">
+    <a href="/decks/<%= deck.id %>" class="stat-link">
+      <span class="stat-value"><%= deck.total_cards %></span>
+      <span class="stat-label">Cards</span>
+    </a>
+  </article>
+  <article class="stat-card">
+    <a href="/decks/<%= deck.id %>/edit" class="stat-link">
+      <span class="stat-value"><%= deckVersion ? deckVersion.label : deck.version %></span>
+      <span class="stat-label">Version</span>
+    </a>
+  </article>
+  <article class="stat-card">
+    <a href="/decks/<%= deck.id %>/symbols" class="stat-link">
+      <span class="stat-value"><%= deck.total_symbols %></span>
+      <span class="stat-label">Symbols</span>
+    </a>
+  </article>
+</section>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Symbols</h2>
+  </div>
+  <div class="symbol-grid">
+    <% symbols.forEach((symbol, index) => { %>
+      <article class="symbol-card">
+        <div class="symbol-card-header">
+          <h3>Symbol <%= index + 1 %></h3>
+        </div>
+        <div class="symbol-preview">
+          <% if (symbol.image_data) { %>
+            <img src="<%= symbol.image_data %>" alt="<%= symbol.label %>" class="symbol-image" />
+          <% } else { %>
+            <div class="symbol-placeholder">No image</div>
+          <% } %>
+        </div>
+        <form method="post" action="/decks/<%= deck.id %>/symbols/<%= symbol.id %>" enctype="multipart/form-data" class="stack-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <label>
+            Symbol name
+            <input type="text" name="label" value="<%= symbol.label %>" maxlength="80" required />
+          </label>
+          <label>
+            Upload image
+            <input type="file" name="image" accept=".png,image/png" />
+          </label>
+          <button type="submit" class="button">Save symbol</button>
+        </form>
+        <% if (symbol.image_data) { %>
+          <form method="post" action="/decks/<%= deck.id %>/symbols/<%= symbol.id %>/remove-image" class="inline-action">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <button type="submit" class="button button-secondary">Remove image</button>
+          </form>
+        <% } %>
+      </article>
+    <% }) %>
+  </div>
+</section>
+
+
+<%- include("partials/footer") %>

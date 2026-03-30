@@ -1,0 +1,90 @@
+<%- include("partials/header") %>
+
+<section class="account-header">
+  <div>
+    <p class="eyebrow"><a href="/account" class="back-link">← My decks</a></p>
+    <h1><%= deck.title %></h1>
+    <p class="muted"><%= deckVersion ? deckVersion.label : deck.version %> deck</p>
+  </div>
+  <div class="hero-actions">
+    <button class="button button-secondary" id="export-zip-btn" data-deck-id="<%= deck.id %>">Export ZIP</button>
+    <button class="button button-secondary" id="export-pdf-btn" data-deck-id="<%= deck.id %>">Export PDF</button>
+    <a href="/decks/<%= deck.id %>/play" class="button">Play online</a>
+  </div>
+</section>
+
+<div class="export-overlay" id="export-overlay" hidden>
+  <div class="export-overlay-box">
+    <div class="export-spinner" id="export-spinner" aria-hidden="true"></div>
+    <p class="export-overlay-title" id="export-overlay-title">Generating&hellip;</p>
+    <p class="export-overlay-sub" id="export-overlay-sub">This may take a few minutes.<br>Your download will start automatically.</p>
+    <button class="button button-secondary" id="export-overlay-close" hidden>Close</button>
+  </div>
+</div>
+
+
+<section class="stats-grid">
+  <article class="stat-card">
+    <a href="/decks/<%= deck.id %>" class="stat-link">
+      <span class="stat-value"><%= deck.total_cards %></span>
+      <span class="stat-label">Cards</span>
+    </a>
+  </article>
+  <article class="stat-card">
+    <a href="/decks/<%= deck.id %>/edit" class="stat-link">
+      <span class="stat-value"><%= deckVersion ? deckVersion.label : deck.version %></span>
+      <span class="stat-label">Version</span>
+    </a>
+  </article>
+  <article class="stat-card">
+    <a href="/decks/<%= deck.id %>/symbols" class="stat-link">
+      <span class="stat-value"><%= deck.total_symbols %></span>
+      <span class="stat-label">Symbols</span>
+    </a>
+  </article>
+</section>
+
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Card Preview</h2>
+    <div class="preview-picker">
+      <label class="preview-picker-label" for="card-picker">Card</label>
+      <select id="card-picker" data-deck-id="<%= deck.id %>">
+        <% previewCards.forEach((_card, index) => { %>
+          <option value="<%= index + 1 %>" <%= selectedCardIndex === index ? 'selected' : '' %>>
+            <%= index + 1 %> / <%= previewCards.length %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+  </div>
+  <div class="card-preview-shell">
+    <article class="web-card-preview">
+      <% cardPreviewLayout.forEach((symbol) => { %>
+        <div
+          class="card-symbol"
+          style="
+            left: calc(50% + <%= (symbol.xRatio * 100).toFixed(3) %>%);
+            top: calc(50% + <%= (symbol.yRatio * 100).toFixed(3) %>%);
+            width: <%= (symbol.sizeRatio * 100).toFixed(3) %>%;
+            height: <%= (symbol.sizeRatio * 100).toFixed(3) %>%;
+            transform: translate(-50%, -50%) rotate(<%= symbol.angle %>deg);
+          "
+        >
+          <img src="<%= symbol.imageData %>" alt="<%= symbol.label %>" />
+        </div>
+      <% }) %>
+    </article>
+    <article class="preview-card">
+      <h3>Card <%= selectedCardIndex + 1 %></h3>
+      <ul>
+        <% selectedCard.forEach((symbol) => { %>
+          <li><%= symbol %></li>
+        <% }) %>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<%- include("partials/footer") %>

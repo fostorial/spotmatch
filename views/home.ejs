@@ -1,0 +1,81 @@
+<%- include("partials/header") %>
+
+<section class="hero-gamey">
+  <div class="hero-gamey-text">
+    <span class="hero-badge">✦ Custom card game creator</span>
+    <h1>Make your own <span class="accent-word">SpotMatch</span> deck</h1>
+    <p class="lede">
+      Design a personalised spot-matching card game with your own symbols and artwork.
+      Create, preview, and export a print-ready deck in minutes.
+    </p>
+    <div class="hero-actions">
+      <% if (currentUser) { %>
+        <a class="button" href="/account">Go to your decks</a>
+      <% } else { %>
+        <a class="button" href="/register">Get started free</a>
+        <a class="button button-secondary" href="/login">Sign in</a>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="hero-dots">
+      <div class="hero-dot" style="width:18px;height:18px;background:var(--accent);top:12%;left:6%"></div>
+      <div class="hero-dot" style="width:10px;height:10px;background:var(--highlight);top:72%;left:4%"></div>
+      <div class="hero-dot" style="width:13px;height:13px;background:#ff6bb5;top:18%;right:8%"></div>
+      <div class="hero-dot" style="width:8px;height:8px;background:var(--accent);top:78%;right:10%"></div>
+      <div class="hero-dot" style="width:22px;height:22px;background:var(--highlight);top:48%;right:4%"></div>
+      <div class="hero-dot" style="width:6px;height:6px;background:#a76fff;top:35%;left:2%"></div>
+    </div>
+    <div class="hero-card-stack">
+      <div class="hero-card hero-card-c"></div>
+      <div class="hero-card hero-card-b"></div>
+      <div class="hero-card hero-card-a">
+        <img src="<%= logoDataUrl %>" alt="SpotMatch" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how-it-works">
+  <div class="how-it-works-header">
+    <h2>How it works</h2>
+    <p>Three steps to your custom game</p>
+  </div>
+  <div class="steps-grid">
+    <article class="step-card">
+      <div class="step-number">1</div>
+      <h3>Create a deck</h3>
+      <p>Choose a SpotMatch version — 13, 31, or 57 cards — and give your deck a name to get started.</p>
+    </article>
+    <article class="step-card">
+      <div class="step-number">2</div>
+      <h3>Add your symbols</h3>
+      <p>Upload PNG artwork for each symbol slot. Use your own photos, drawings, or icons to personalise every card.</p>
+    </article>
+    <article class="step-card">
+      <div class="step-number">3</div>
+      <h3>Export &amp; print</h3>
+      <p>Preview every card, then export a print-ready PDF. Cut out the circles and your game is ready to play.</p>
+    </article>
+  </div>
+</section>
+
+<% if (stats) { %>
+  <section class="home-stats stats-grid">
+    <article class="stat-card">
+      <span class="stat-value"><%= stats.totalDecks %></span>
+      <span class="stat-label">Decks created</span>
+    </article>
+    <article class="stat-card">
+      <span class="stat-value"><%= stats.totalCards %></span>
+      <span class="stat-label">Cards generated</span>
+    </article>
+    <article class="stat-card">
+      <span class="stat-value"><%= stats.totalSymbols %></span>
+      <span class="stat-label">Custom symbols</span>
+    </article>
+  </section>
+<% } %>
+
+<%- include("partials/footer") %>
